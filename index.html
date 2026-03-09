@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InnerG AI Deploy — Your AI Assistant, Deployed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js for 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #0f0f0f;
+            --bg-card: #141414;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent-green: #00ff88;
+            --accent-green-dim: #00cc6a;
+            --accent-orange: #ff6b35;
+            --border: #222222;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* 3D Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 0;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            padding: 10px 20px;
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 80px;
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            margin-bottom: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1.05;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            color: var(--bg-primary);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.4);
+        }
+
+        .hero-secondary {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Floating elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .float-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-green);
+            top: 20%;
+            right: 10%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .float-2 {
+            width: 300px;
+            height: 300px;
+            background: #00ccff;
+            bottom: 20%;
+            left: 5%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Problem Section */
+        .problem {
+            position: relative;
+            z-index: 1;
+            padding: 120px 0;
+            background: linear-gradient(180deg, transparent, rgba(0, 255, 136, 0.02), transparent);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .problem-card {
+            padding: 40px;
+            background: rgba(20, 20, 20, 0.6);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        .problem-card:hover::before {
+            opacity: 1;
+        }
+
+        .problem-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+        }
+
+        .problem-card p {
+            color: var(--text-secondary);
+        }
+
+        /* How It Works */
+        .how-it-works {
+            position: relative;
+            z-index: 1;
+            padding: 120px 0;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 32px 24px;
+            position: relative;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: -16px;
+            width: 32px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), transparent);
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step-number {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--bg-primary);
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            opacity: 0.3;
+            filter: blur(10px);
+        }
+
+        .step h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Pricing */
+        .pricing {
+            position: relative;
+            z-index: 1;
+            padding: 120px 0;
+            background: linear-gradient(180deg, transparent, rgba(0, 204, 255, 0.02), transparent);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 20px;
+            padding: 48px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--accent-green), transparent, transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .pricing-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .pricing-card-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-green);
+        }
+
+        .pricing-card.featured::after {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 6px 12px;
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .price {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 32px 0;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .pricing-features li {
+            padding: 10px 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        .pricing-cta {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            text-align: center;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .pricing-cta:hover {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+        }
+
+        .pricing-card.featured .pricing-cta {
+            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            color: var(--bg-primary);
+            border: none;
+        }
+
+        /* Managed Care */
+        .managed-care {
+            position: relative;
+            z-index: 1;
+            padding: 60px 0 120px;
+        }
+
+        .managed-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .managed-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .managed-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 24px 0;
+        }
+
+        .managed-features span {
+            padding: 8px 16px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+        }
+
+        /* FAQ */
+        .faq {
+            position: relative;
+            z-index: 1;
+            padding: 120px 0;
+            background: linear-gradient(180deg, transparent, rgba(0, 255, 136, 0.02), transparent);
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 32px 0;
+        }
+
+        .faq-item h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-item h3::after {
+            content: '+';
+            color: var(--accent-green);
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active h3::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active p {
+            max-height: 200px;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            position: relative;
+            z-index: 1;
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        .final-cta h2 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .final-cta p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-green);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .steps-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .step::after {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-cta-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Canvas Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Floating Elements -->
+    <div class="floating-element float-1"></div>
+    <div class="floating-element float-2"></div>
+
+    <!-- Nav -->
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">InnerG AI Deploy</div>
+            <ul class="nav-links">
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+            <a href="https://cal.com/michaelsf/setup-clawdbot" class="nav-cta" target="_blank">Book a Call</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">Powered by OpenClaw</div>
+                <h1>Your AI Assistant, <span class="gradient">Deployed.</span></h1>
+                <p class="hero-sub">We set up your always-on AI agent — email triage, calendar management, automated workflows — so you can just use it.</p>
+                <div class="hero-cta-group">
+                    <a href="#pricing" class="hero-cta">See Pricing</a>
+                    <span class="hero-secondary">No technical knowledge required</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem -->
+    <section class="problem">
+        <div class="container">
+            <div class="section-header">
+                <h2>You Don't Need Another Chatbot</h2>
+                <p>ChatGPT waits for you. Your AI should work for you.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <h3>ChatGPT Doesn't Work For You</h3>
+                    <p>It waits for you to open it. Your AI should be checking your email, managing your calendar, and handling tasks while you sleep.</p>
+                </div>
+                <div class="problem-card">
+                    <h3>DIY Setup = Security Gaps</h3>
+                    <p>Every self-install we've seen has exposed credentials, no sandboxing, and no audit trail. One wrong config and your data's at risk.</p>
+                </div>
+                <div class="problem-card">
+                    <h3>You're Busy. We Get It.</h3>
+                    <p>You could spend 10 hours learning terminal commands, OAuth flows, and Docker configs. Or you could just start using your AI today.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>From zero to deployed in 48 hours or less</p>
+            </div>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Book a Call</h3>
+                    <p>We discuss your goals and map your integrations</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>We Deploy</h3>
+                    <p>Server setup, security hardening, workflow config</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>You Go Live</h3>
+                    <p>Message your AI on Telegram, Discord, or WhatsApp</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Hypercare</h3>
+                    <p>14 days of tuning, adjustments, and training</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple Pricing</h2>
+                <p>One-time setup. Optional managed care. No hidden fees.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-card-inner">
+                        <h3>Remote Setup</h3>
+                        <p class="tagline">We deploy, you just start using it</p>
+                        <div class="price">$799 <span>one-time</span></div>
+                        <ul class="pricing-features">
+                            <li>VPS provisioning + OpenClaw install</li>
+                            <li>Security hardening (Docker, firewall)</li>
+                            <li>Email + calendar integration</li>
+                            <li>One messaging channel</li>
+                            <li>Up to 3 custom workflows</li>
+                            <li>14-day hypercare</li>
+                        </ul>
+                        <a href="https://cal.com/michaelsf/setup-clawdbot" class="pricing-cta" target="_blank">Book a Call</a>
+                    </div>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="pricing-card-inner">
+                        <h3>In-Person Setup</h3>
+                        <p class="tagline">We show up, set it up, train you live</p>
+                        <div class="price">$1,299+ <span>one-time</span></div>
+                        <ul class="pricing-features">
+                            <li>Everything in Remote Setup</li>
+                            <li>On-site deployment (Philly tri-state)</li>
+                            <li>Mac or Mac Mini setup</li>
+                            <li>iMessage integration</li>
+                            <li>Hands-on training session</li>
+                            <li>30-day priority support</li>
+                        </ul>
+                        <a href="https://cal.com/michaelsf/setup-clawdbot" class="pricing-cta" target="_blank">Book a Call</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Managed Care -->
+            <div class="managed-care">
+                <div class="managed-card">
+                    <h3>Managed Care</h3>
+                    <p class="tagline">Keep everything running smoothly</p>
+                    <div class="price">$149 <span>/month</span></div>
+                    <div class="managed-features">
+                        <span>Configuration adjustments</span>
+                        <span>Diagnosis + troubleshooting</span>
+                        <span>Monthly updates</span>
+                        <span>Security patches</span>
+                        <span>Workflow tuning</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Add to any setup. Cancel anytime.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2>Questions?</h2>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>What is OpenClaw?</h3>
+                    <p>An open-source AI assistant that runs 24/7. It triages email, schedules meetings, drafts replies, and automates workflows — proactively, without you asking.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Do I need to be technical?</h3>
+                    <p>Not at all. We handle everything. After setup, you talk to your AI through Telegram, Discord, or WhatsApp just like texting an assistant.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Is it secure?</h3>
+                    <p>Yes. We use OAuth middleware so your AI never sees raw credentials. Docker sandboxing, firewall hardening, and read-only permissions by default.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Remote vs In-Person?</h3>
+                    <p>Remote is fully remote deployment. In-Person is for Philly tri-state clients who want us on-site with hands-on training and iMessage integration.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What if I already have OpenClaw?</h3>
+                    <p>We can audit your setup, add security hardening, fix gaps, and migrate you to managed care. Book a call and we'll assess.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How fast can I go live?</h3>
+                    <p>Same day to 48 hours. Book a call, do a 20-45 min kickoff, then a 1-3 hour setup session where your AI goes live.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Ready to Deploy?</h2>
+            <p>Stop managing tools. Start leveraging intelligence.</p>
+            <a href="https://cal.com/michaelsf/setup-clawdbot" class="hero-cta" target="_blank">Book a Call</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026 <a href="https://innergclaw.github.io/innerg-ecosystem/" target="_blank">InnerG Intel</a>. Powered by <a href="https://openclaw.ai" target="_blank">OpenClaw</a>.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 3D Scene Setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Create floating particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 500;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0x00ff88,
+            transparent: true,
+            opacity: 0.6
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // Create floating geometric shapes
+        const geometry1 = new THREE.IcosahedronGeometry(0.5, 0);
+        const material1 = new THREE.MeshBasicMaterial({ 
+            color: 0x00ff88, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const shape1 = new THREE.Mesh(geometry1, material1);
+        shape1.position.set(3, 1, -2);
+        scene.add(shape1);
+
+        const geometry2 = new THREE.OctahedronGeometry(0.4, 0);
+        const material2 = new THREE.MeshBasicMaterial({ 
+            color: 0x00ccff, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const shape2 = new THREE.Mesh(geometry2, material2);
+        shape2.position.set(-2, -1, -1);
+        scene.add(shape2);
+
+        const geometry3 = new THREE.TetrahedronGeometry(0.3, 0);
+        const material3 = new THREE.MeshBasicMaterial({ 
+            color: 0xff6b35, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const shape3 = new THREE.Mesh(geometry3, material3);
+        shape3.position.set(1, 2, -3);
+        scene.add(shape3);
+
+        camera.position.z = 5;
+
+        // Mouse movement
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate particles
+            particlesMesh.rotation.y += 0.0005;
+            particlesMesh.rotation.x += 0.0002;
+
+            // Rotate shapes
+            shape1.rotation.x += 0.003;
+            shape1.rotation.y += 0.005;
+            
+            shape2.rotation.x += 0.004;
+            shape2.rotation.z += 0.003;
+            
+            shape3.rotation.y += 0.005;
+            shape3.rotation.z += 0.004;
+
+            // Mouse influence
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Scroll animations
+        gsap.utils.toArray('.problem-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                delay: i * 0.1
+            });
+        });
+
+        gsap.utils.toArray('.step').forEach((step, i) => {
+            gsap.from(step, {
+                scrollTrigger: {
+                    trigger: step,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                y: 30,
+                opacity: 0,
+                duration: 0.5,
+                delay: i * 0.15
+            });
+        });
+
+        gsap.utils.toArray('.pricing-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                delay: i * 0.2
+            });
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-item h3').forEach(item => {
+            item.addEventListener('click', () => {
+                const parent = item.parentElement;
+                parent.classList.toggle('active');
+            });
+        });
+
+        // Parallax on scroll
+        gsap.to('.floating-element', {
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1
+            },
+            y: -100
+        });
+    </script>
+</body>
+</html>

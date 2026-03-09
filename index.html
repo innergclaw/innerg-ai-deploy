@@ -3,29 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="InnerG AI Deploy — White-glove OpenClaw deployment service. We set up your AI agent, you just use it.">
     <title>InnerG AI Deploy — Your AI Assistant, Deployed</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Three.js for 3D -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- GSAP for animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ========== DESIGN TOKENS ========== */
         :root {
+            /* Brand Colors */
+            --color-primary: #00ff88;
+            --color-secondary: #00ccff;
+            --color-accent: #ff6b35;
+            
+            /* Surfaces */
             --bg-primary: #0a0a0a;
-            --bg-secondary: #0f0f0f;
+            --bg-secondary: #111111;
+            --bg-elevated: #1a1a1a;
             --bg-card: #141414;
-            --text-primary: #ffffff;
-            --text-secondary: #888888;
-            --accent-green: #00ff88;
-            --accent-green-dim: #00cc6a;
-            --accent-orange: #ff6b35;
-            --border: #222222;
+            
+            /* Text */
+            --color-text-primary: #ffffff;
+            --color-text-secondary: #888888;
+            --color-text-muted: #666666;
+            
+            /* Borders */
+            --color-border: #222222;
+            --color-border-hover: #333333;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.5rem;
+            --space-6: 2rem;
+            --space-8: 3rem;
+            --space-10: 4rem;
+            --space-12: 5rem;
+            
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-2xl: 24px;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --shadow-glow: 0 0 30px rgba(0, 255, 136, 0.2);
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.25s ease;
+            --transition-slow: 0.4s ease;
         }
 
-        * {
+        /* ========== RESET ========== */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -33,42 +70,49 @@
 
         html {
             scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
-            color: var(--text-primary);
+            color: var(--color-text-primary);
             line-height: 1.6;
             overflow-x: hidden;
         }
 
+        /* ========== UTILITIES ========== */
         .container {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 var(--space-4);
         }
 
-        /* 3D Canvas */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
+        .gradient-text {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* Nav */
+        .accent-gradient {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ========== NAVIGATION ========== */
         nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 100;
-            padding: 20px 0;
-            background: rgba(10, 10, 10, 0.8);
+            z-index: 1000;
+            padding: var(--space-5) 0;
+            background: rgba(10, 10, 10, 0.85);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -82,117 +126,183 @@
         .logo {
             font-size: 1.25rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-orange));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: -0.5px;
         }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: var(--space-8);
             list-style: none;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--color-text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.3s;
+            font-weight: 500;
+            transition: color var(--transition-fast);
         }
 
         .nav-links a:hover {
-            color: var(--text-primary);
+            color: var(--color-text-primary);
         }
 
         .nav-cta {
-            padding: 10px 20px;
-            background: var(--accent-green);
+            padding: var(--space-2) var(--space-5);
+            background: var(--color-primary);
             color: var(--bg-primary);
             text-decoration: none;
             font-weight: 600;
-            border-radius: 6px;
             font-size: 0.9rem;
-            transition: all 0.3s;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
         }
 
         .nav-cta:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            box-shadow: var(--shadow-glow);
         }
 
-        /* Hero */
+        /* ========== HERO ========== */
         .hero {
             position: relative;
-            z-index: 1;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 120px 0 80px;
+            padding: 120px 0 var(--space-12);
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .hero-gradient {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .hero-gradient-1 {
+            top: -200px;
+            right: -100px;
+            background: var(--color-primary);
+        }
+
+        .hero-gradient-2 {
+            bottom: -200px;
+            left: -100px;
+            background: var(--color-secondary);
+            animation-delay: -10s;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
         }
 
         .hero-content {
-            max-width: 700px;
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
         }
 
         .hero-badge {
-            display: inline-block;
-            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
             background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.2);
             border-radius: 100px;
             font-size: 0.85rem;
-            color: var(--accent-green);
-            margin-bottom: 24px;
-            animation: pulse 2s infinite;
+            color: var(--color-primary);
+            margin-bottom: var(--space-5);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            50% { opacity: 0.8; }
         }
 
-        .hero h1 {
-            font-size: 4.5rem;
-            font-weight: 700;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
             line-height: 1.05;
-            margin-bottom: 24px;
+            letter-spacing: -2px;
+            margin-bottom: var(--space-5);
         }
 
-        .hero h1 .gradient {
-            background: linear-gradient(135deg, var(--accent-green), #00ccff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-sub {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            max-width: 500px;
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin-bottom: var(--space-8);
+            line-height: 1.7;
         }
 
         .hero-cta-group {
             display: flex;
-            gap: 16px;
+            gap: var(--space-4);
+            flex-wrap: wrap;
             align-items: center;
         }
 
-        .hero-cta {
-            display: inline-block;
-            padding: 16px 32px;
-            background: linear-gradient(135deg, var(--accent-green), #00ccff);
-            color: var(--bg-primary);
-            text-decoration: none;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-md);
             font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all var(--transition-base);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: var(--bg-primary);
             position: relative;
             overflow: hidden;
         }
 
-        .hero-cta::before {
+        .btn-primary::before {
             content: '';
             position: absolute;
             top: 0;
@@ -203,91 +313,78 @@
             transition: left 0.5s;
         }
 
-        .hero-cta:hover::before {
+        .btn-primary:hover::before {
             left: 100%;
         }
 
-        .hero-cta:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
         }
 
-        .hero-secondary {
-            color: var(--text-secondary);
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .hero-note {
             font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-top: var(--space-4);
         }
 
-        /* Floating elements */
-        .floating-element {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .float-1 {
-            width: 400px;
-            height: 400px;
-            background: var(--accent-green);
-            top: 20%;
-            right: 10%;
-            animation: float 8s ease-in-out infinite;
-        }
-
-        .float-2 {
-            width: 300px;
-            height: 300px;
-            background: #00ccff;
-            bottom: 20%;
-            left: 5%;
-            animation: float 10s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-
-        /* Problem Section */
-        .problem {
+        /* ========== SECTIONS ========== */
+        section {
             position: relative;
             z-index: 1;
-            padding: 120px 0;
-            background: linear-gradient(180deg, transparent, rgba(0, 255, 136, 0.02), transparent);
+        }
+
+        .section {
+            padding: var(--space-12) 0;
+        }
+
+        .section-alt {
+            background: var(--bg-secondary);
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: var(--space-10);
         }
 
         .section-header h2 {
-            font-size: 3rem;
-            margin-bottom: 16px;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: var(--space-4);
         }
 
         .section-header p {
-            color: var(--text-secondary);
             font-size: 1.1rem;
+            color: var(--color-text-secondary);
             max-width: 600px;
             margin: 0 auto;
         }
 
+        /* ========== PROBLEM CARDS ========== */
         .problem-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
+            gap: var(--space-5);
         }
 
         .problem-card {
-            padding: 40px;
-            background: rgba(20, 20, 20, 0.6);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: var(--space-6);
+            background: var(--bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            transition: all var(--transition-base);
             position: relative;
             overflow: hidden;
         }
@@ -299,14 +396,14 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity var(--transition-base);
         }
 
         .problem-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(0, 255, 136, 0.3);
+            transform: translateY(-4px);
+            border-color: var(--color-border-hover);
         }
 
         .problem-card:hover::before {
@@ -315,30 +412,25 @@
 
         .problem-card h3 {
             font-size: 1.25rem;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-3);
+            font-weight: 600;
         }
 
         .problem-card p {
-            color: var(--text-secondary);
+            color: var(--color-text-secondary);
+            line-height: 1.7;
         }
 
-        /* How It Works */
-        .how-it-works {
-            position: relative;
-            z-index: 1;
-            padding: 120px 0;
-        }
-
-        .steps-container {
+        /* ========== STEPS ========== */
+        .steps-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-            margin-top: 60px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
         }
 
         .step {
             text-align: center;
-            padding: 32px 24px;
+            padding: var(--space-5);
             position: relative;
         }
 
@@ -346,10 +438,10 @@
             content: '';
             position: absolute;
             top: 40px;
-            right: -16px;
-            width: 32px;
+            right: -10px;
+            width: 20px;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent-green), transparent);
+            background: linear-gradient(90deg, var(--color-primary), transparent);
         }
 
         .step:last-child::after {
@@ -359,7 +451,7 @@
         .step-number {
             width: 64px;
             height: 64px;
-            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -367,7 +459,7 @@
             font-weight: 700;
             font-size: 1.5rem;
             color: var(--bg-primary);
-            margin: 0 auto 24px;
+            margin: 0 auto var(--space-5);
             position: relative;
         }
 
@@ -376,233 +468,198 @@
             position: absolute;
             inset: -4px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-green), #00ccff);
-            opacity: 0.3;
-            filter: blur(10px);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            opacity: 0.2;
+            filter: blur(8px);
         }
 
         .step h3 {
             font-size: 1.1rem;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-3);
+            font-weight: 600;
         }
 
         .step p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
         }
 
-        /* Pricing */
-        .pricing {
-            position: relative;
-            z-index: 1;
-            padding: 120px 0;
-            background: linear-gradient(180deg, transparent, rgba(0, 204, 255, 0.02), transparent);
-        }
-
+        /* ========== PRICING ========== */
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: var(--space-6);
             max-width: 900px;
             margin: 0 auto;
         }
 
         .pricing-card {
-            background: rgba(20, 20, 20, 0.8);
-            border-radius: 20px;
-            padding: 48px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            transition: all 0.4s;
+            background: var(--bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            transition: all var(--transition-base);
             position: relative;
-            overflow: hidden;
         }
 
-        .pricing-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, var(--accent-green), transparent, transparent);
-            opacity: 0;
-            transition: opacity 0.5s;
-            animation: rotate 4s linear infinite;
-        }
-
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
-        }
-
-        .pricing-card:hover::before {
-            opacity: 0.1;
-        }
-
-        .pricing-card-inner {
-            position: relative;
-            z-index: 1;
+        .pricing-card:hover {
+            transform: translateY(-8px);
         }
 
         .pricing-card.featured {
-            border-color: var(--accent-green);
+            border-color: var(--color-primary);
         }
 
-        .pricing-card.featured::after {
+        .pricing-card.featured::before {
             content: 'RECOMMENDED';
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 6px 12px;
-            background: var(--accent-green);
+            top: var(--space-4);
+            right: var(--space-4);
+            padding: var(--space-1) var(--space-3);
+            background: var(--color-primary);
             color: var(--bg-primary);
             font-size: 0.7rem;
-            font-weight: 600;
-            border-radius: 4px;
+            font-weight: 700;
             letter-spacing: 1px;
+            border-radius: var(--radius-sm);
         }
 
         .pricing-card h3 {
             font-size: 1.75rem;
-            margin-bottom: 8px;
+            font-weight: 700;
+            margin-bottom: var(--space-2);
         }
 
-        .tagline {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
+        .pricing-card .tagline {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-6);
         }
 
         .price {
             font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-weight: 800;
+            margin-bottom: var(--space-2);
+            letter-spacing: -2px;
         }
 
         .price span {
             font-size: 1rem;
             font-weight: 400;
-            color: var(--text-secondary);
+            color: var(--color-text-muted);
         }
 
         .pricing-features {
             list-style: none;
-            margin: 32px 0;
-            padding-top: 32px;
-            border-top: 1px solid var(--border);
+            margin: var(--space-6) 0;
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
         }
 
         .pricing-features li {
-            padding: 10px 0;
-            color: var(--text-secondary);
+            padding: var(--space-2) 0;
+            color: var(--color-text-secondary);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--space-3);
         }
 
         .pricing-features li::before {
             content: '✓';
-            color: var(--accent-green);
+            color: var(--color-primary);
             font-weight: 700;
         }
 
         .pricing-cta {
             display: block;
             width: 100%;
-            padding: 16px;
+            padding: var(--space-4);
             text-align: center;
             background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-primary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            transition: all var(--transition-base);
+            margin-top: var(--space-5);
         }
 
         .pricing-cta:hover {
-            background: var(--accent-green);
+            background: var(--color-primary);
             color: var(--bg-primary);
-            border-color: var(--accent-green);
+            border-color: var(--color-primary);
         }
 
         .pricing-card.featured .pricing-cta {
-            background: linear-gradient(135deg, var(--accent-green), #00ccff);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
             color: var(--bg-primary);
             border: none;
         }
 
-        /* Managed Care */
-        .managed-care {
-            position: relative;
-            z-index: 1;
-            padding: 60px 0 120px;
-        }
-
+        /* ========== MANAGED CARE ========== */
         .managed-card {
-            background: rgba(20, 20, 20, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 48px;
+            background: var(--bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
             max-width: 600px;
-            margin: 0 auto;
+            margin: var(--space-10) auto 0;
             text-align: center;
-            backdrop-filter: blur(10px);
         }
 
         .managed-card h3 {
             font-size: 1.5rem;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-2);
         }
 
         .managed-features {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: var(--space-3);
             justify-content: center;
-            margin: 24px 0;
+            margin: var(--space-5) 0;
         }
 
         .managed-features span {
-            padding: 8px 16px;
+            padding: var(--space-2) var(--space-4);
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid rgba(0, 255, 136, 0.2);
             border-radius: 100px;
             font-size: 0.85rem;
-            color: var(--accent-green);
+            color: var(--color-primary);
         }
 
-        /* FAQ */
-        .faq {
-            position: relative;
-            z-index: 1;
-            padding: 120px 0;
-            background: linear-gradient(180deg, transparent, rgba(0, 255, 136, 0.02), transparent);
+        .managed-note {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-top: var(--space-4);
         }
 
+        /* ========== FAQ ========== */
         .faq-grid {
             max-width: 800px;
             margin: 0 auto;
         }
 
         .faq-item {
-            border-bottom: 1px solid var(--border);
-            padding: 32px 0;
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--space-5) 0;
         }
 
         .faq-item h3 {
             font-size: 1.1rem;
-            margin-bottom: 12px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 600;
         }
 
         .faq-item h3::after {
             content: '+';
-            color: var(--accent-green);
+            color: var(--color-primary);
             font-size: 1.5rem;
-            transition: transform 0.3s;
+            transition: transform var(--transition-base);
         }
 
         .faq-item.active h3::after {
@@ -610,54 +667,57 @@
         }
 
         .faq-item p {
-            color: var(--text-secondary);
+            color: var(--color-text-secondary);
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: max-height var(--transition-base), padding var(--transition-base);
         }
 
         .faq-item.active p {
             max-height: 200px;
+            padding-top: var(--space-3);
         }
 
-        /* Final CTA */
-        .final-cta {
-            position: relative;
-            z-index: 1;
-            padding: 120px 0;
+        /* ========== CTA ========== */
+        .cta-section {
             text-align: center;
+            padding: var(--space-12) 0;
         }
 
-        .final-cta h2 {
-            font-size: 3rem;
-            margin-bottom: 16px;
+        .cta-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: var(--space-4);
+            letter-spacing: -1px;
         }
 
-        .final-cta p {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
+        .cta-section p {
+            color: var(--color-text-secondary);
             font-size: 1.1rem;
+            margin-bottom: var(--space-6);
         }
 
-        /* Footer */
+        /* ========== FOOTER ========== */
         footer {
-            position: relative;
-            z-index: 1;
-            padding: 40px 0;
-            border-top: 1px solid var(--border);
+            padding: var(--space-8) 0;
+            border-top: 1px solid var(--color-border);
             text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
         }
 
         footer a {
-            color: var(--accent-green);
+            color: var(--color-primary);
             text-decoration: none;
         }
 
-        /* Responsive */
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 1024px) {
-            .steps-container {
+            .steps-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             
@@ -667,67 +727,86 @@
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 3rem;
-            }
-
             .nav-links {
                 display: none;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-cta-group {
+                flex-direction: column;
+                align-items: stretch;
             }
 
             .pricing-grid {
                 grid-template-columns: 1fr;
             }
 
-            .steps-container {
+            .steps-grid {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .hero-cta-group {
-                flex-direction: column;
-                align-items: flex-start;
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease-out forwards;
         }
     </style>
 </head>
 <body>
-    <!-- 3D Canvas Background -->
-    <div id="canvas-container"></div>
-
-    <!-- Floating Elements -->
-    <div class="floating-element float-1"></div>
-    <div class="floating-element float-2"></div>
-
-    <!-- Nav -->
+    <!-- Navigation -->
     <nav>
         <div class="container nav-content">
-            <div class="logo">InnerG AI Deploy</div>
+            <div class="logo gradient-text">InnerG AI Deploy</div>
             <ul class="nav-links">
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#pricing">Pricing</a></li>
                 <li><a href="#faq">FAQ</a></li>
             </ul>
-            <a href="https://cal.com/ownyourwebsystems/remote-setup" class="nav-cta" target="_blank">Book a Call</a>
+            <a href="https://cal.com/ownyourwebsystems/remote-setup" class="nav-cta" target="_blank" rel="noopener">Book a Call</a>
         </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-gradient hero-gradient-1"></div>
+            <div class="hero-gradient hero-gradient-2"></div>
+            <div class="hero-grid"></div>
+        </div>
         <div class="container">
             <div class="hero-content">
                 <div class="hero-badge">Powered by OpenClaw</div>
-                <h1>Your AI Assistant, <span class="gradient">Deployed.</span></h1>
-                <p class="hero-sub">We set up your always-on AI agent — email triage, calendar management, automated workflows — so you can just use it.</p>
+                <h1 class="hero-title">
+                    Your AI Assistant, <span class="gradient-text">Deployed.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    We set up your always-on AI agent — email triage, calendar management, automated workflows — so you can just use it. No technical knowledge required.
+                </p>
                 <div class="hero-cta-group">
-                    <a href="#pricing" class="hero-cta">See Pricing</a>
-                    <span class="hero-secondary">No technical knowledge required</span>
+                    <a href="#pricing" class="btn btn-primary">See Pricing</a>
+                    <a href="https://cal.com/ownyourwebsystems/remote-setup" class="btn btn-secondary" target="_blank" rel="noopener">Book a Call</a>
                 </div>
+                <p class="hero-note">Remote worldwide • In-person (Philly tri-state)</p>
             </div>
         </div>
     </section>
 
     <!-- Problem -->
-    <section class="problem">
+    <section class="section section-alt">
         <div class="container">
             <div class="section-header">
                 <h2>You Don't Need Another Chatbot</h2>
@@ -751,13 +830,13 @@
     </section>
 
     <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
+    <section class="section" id="how-it-works">
         <div class="container">
             <div class="section-header">
                 <h2>How It Works</h2>
                 <p>From zero to deployed in 48 hours or less</p>
             </div>
-            <div class="steps-container">
+            <div class="steps-grid">
                 <div class="step">
                     <div class="step-number">1</div>
                     <h3>Book a Call</h3>
@@ -783,7 +862,7 @@
     </section>
 
     <!-- Pricing -->
-    <section class="pricing" id="pricing">
+    <section class="section section-alt" id="pricing">
         <div class="container">
             <div class="section-header">
                 <h2>Simple Pricing</h2>
@@ -791,61 +870,52 @@
             </div>
             <div class="pricing-grid">
                 <div class="pricing-card">
-                    <div class="pricing-card-inner">
-                        <h3>Remote Setup</h3>
-                        <p class="tagline">We deploy, you just start using it</p>
-                        <div class="price">$799 <span>one-time</span></div>
-                        <ul class="pricing-features">
-                            <li>Private server setup + full installation</li>
-                            <li>Bank-grade security & data protection</li>
-                            <li>Your email + calendar connected</li>
-                            <li>Chat via Telegram, Discord, or WhatsApp</li>
-                            <li>3 automated workflows built for you</li>
-                            <li>14 days of hands-on support</li>
-                        </ul>
-                        <a href="https://cal.com/ownyourwebsystems/remote-setup" class="pricing-cta" target="_blank">Book a Call</a>
-                    </div>
+                    <h3>Remote Setup</h3>
+                    <p class="tagline">We deploy, you just start using it</p>
+                    <div class="price">$799 <span>one-time</span></div>
+                    <ul class="pricing-features">
+                        <li>Private server setup + full installation</li>
+                        <li>Bank-grade security & data protection</li>
+                        <li>Your email + calendar connected</li>
+                        <li>Chat via Telegram, Discord, or WhatsApp</li>
+                        <li>3 automated workflows built for you</li>
+                        <li>14 days of hands-on support</li>
+                    </ul>
+                    <a href="https://cal.com/ownyourwebsystems/remote-setup" class="pricing-cta" target="_blank" rel="noopener">Book a Call</a>
                 </div>
-
                 <div class="pricing-card featured">
-                    <div class="pricing-card-inner">
-                        <h3>In-Person Setup</h3>
-                        <p class="tagline">We show up, set it up, train you live</p>
-                        <div class="price">$1,200 <span>one-time</span></div>
-                        <ul class="pricing-features">
-                            <li>Everything in Remote Setup included</li>
-                            <li>We come to you (Philly tri-state area)</li>
-                            <li>Set up on your Mac or Mac Mini</li>
-                            <li>Text your AI via iMessage</li>
-                            <li>Personal training session (live)</li>
-                            <li>30 days of priority support</li>
-                        </ul>
-                        <a href="https://cal.com/ownyourwebsystems/in-person-setup" class="pricing-cta" target="_blank">Book a Call</a>
-                    </div>
+                    <h3>In-Person Setup</h3>
+                    <p class="tagline">We show up, set it up, train you live</p>
+                    <div class="price">$1,200 <span>one-time</span></div>
+                    <ul class="pricing-features">
+                        <li>Everything in Remote Setup included</li>
+                        <li>We come to you (Philly tri-state area)</li>
+                        <li>Set up on your Mac or Mac Mini</li>
+                        <li>Text your AI via iMessage</li>
+                        <li>Personal training session (live)</li>
+                        <li>30 days of priority support</li>
+                    </ul>
+                    <a href="https://cal.com/ownyourwebsystems/in-person-setup" class="pricing-cta" target="_blank" rel="noopener">Book a Call</a>
                 </div>
             </div>
-
-            <!-- Managed Care -->
-            <div class="managed-care">
-                <div class="managed-card">
-                    <h3>Managed Care</h3>
-                    <p class="tagline">Keep everything running smoothly</p>
-                    <div class="price">$149 <span>/month</span></div>
-                    <div class="managed-features">
-                        <span>Configuration adjustments</span>
-                        <span>Diagnosis + troubleshooting</span>
-                        <span>Monthly updates</span>
-                        <span>Security patches</span>
-                        <span>Workflow tuning</span>
-                    </div>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Add to any setup. Cancel anytime.</p>
+            <div class="managed-card">
+                <h3>Managed Care</h3>
+                <p class="tagline">Keep everything running smoothly</p>
+                <div class="price">$149 <span>/month</span></div>
+                <div class="managed-features">
+                    <span>Configuration adjustments</span>
+                    <span>Diagnosis + troubleshooting</span>
+                    <span>Monthly updates</span>
+                    <span>Security patches</span>
+                    <span>Workflow tuning</span>
                 </div>
+                <p class="managed-note">Add to any setup. Cancel anytime.</p>
             </div>
         </div>
     </section>
 
     <!-- FAQ -->
-    <section class="faq" id="faq">
+    <section class="section" id="faq">
         <div class="container">
             <div class="section-header">
                 <h2>Questions?</h2>
@@ -879,181 +949,24 @@
         </div>
     </section>
 
-    <!-- Final CTA -->
-    <section class="final-cta">
+    <!-- CTA -->
+    <section class="cta-section">
         <div class="container">
             <h2>Ready to Deploy?</h2>
             <p>Stop managing tools. Start leveraging intelligence.</p>
-            <a href="https://cal.com/ownyourwebsystems/remote-setup" class="hero-cta" target="_blank">Book a Call</a>
+            <a href="https://cal.com/ownyourwebsystems/remote-setup" class="btn btn-primary" target="_blank" rel="noopener">Book a Call</a>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>© 2026 <a href="https://innergclaw.github.io/innerg-ecosystem/" target="_blank">InnerG Intel</a>. Powered by <a href="https://openclaw.ai" target="_blank">OpenClaw</a>.</p>
+            <p>© 2026 <a href="https://innergclaw.github.io/innerg-ecosystem/" target="_blank" rel="noopener">InnerG Intel</a>. Powered by <a href="https://openclaw.ai" target="_blank" rel="noopener">OpenClaw</a>.</p>
         </div>
     </footer>
 
     <script>
-        // Initialize GSAP ScrollTrigger
-        gsap.registerPlugin(ScrollTrigger);
-
-        // 3D Scene Setup
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
-
-        // Create floating particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 500;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 10;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.02,
-            color: 0x00ff88,
-            transparent: true,
-            opacity: 0.6
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        // Create floating geometric shapes
-        const geometry1 = new THREE.IcosahedronGeometry(0.5, 0);
-        const material1 = new THREE.MeshBasicMaterial({ 
-            color: 0x00ff88, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.3
-        });
-        const shape1 = new THREE.Mesh(geometry1, material1);
-        shape1.position.set(3, 1, -2);
-        scene.add(shape1);
-
-        const geometry2 = new THREE.OctahedronGeometry(0.4, 0);
-        const material2 = new THREE.MeshBasicMaterial({ 
-            color: 0x00ccff, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.3
-        });
-        const shape2 = new THREE.Mesh(geometry2, material2);
-        shape2.position.set(-2, -1, -1);
-        scene.add(shape2);
-
-        const geometry3 = new THREE.TetrahedronGeometry(0.3, 0);
-        const material3 = new THREE.MeshBasicMaterial({ 
-            color: 0xff6b35, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.3
-        });
-        const shape3 = new THREE.Mesh(geometry3, material3);
-        shape3.position.set(1, 2, -3);
-        scene.add(shape3);
-
-        camera.position.z = 5;
-
-        // Mouse movement
-        let mouseX = 0;
-        let mouseY = 0;
-
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Rotate particles
-            particlesMesh.rotation.y += 0.0005;
-            particlesMesh.rotation.x += 0.0002;
-
-            // Rotate shapes
-            shape1.rotation.x += 0.003;
-            shape1.rotation.y += 0.005;
-            
-            shape2.rotation.x += 0.004;
-            shape2.rotation.z += 0.003;
-            
-            shape3.rotation.y += 0.005;
-            shape3.rotation.z += 0.004;
-
-            // Mouse influence
-            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Resize handler
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // Scroll animations
-        gsap.utils.toArray('.problem-card').forEach((card, i) => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse'
-                },
-                y: 50,
-                opacity: 0,
-                duration: 0.6,
-                delay: i * 0.1
-            });
-        });
-
-        gsap.utils.toArray('.step').forEach((step, i) => {
-            gsap.from(step, {
-                scrollTrigger: {
-                    trigger: step,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse'
-                },
-                y: 30,
-                opacity: 0,
-                duration: 0.5,
-                delay: i * 0.15
-            });
-        });
-
-        gsap.utils.toArray('.pricing-card').forEach((card, i) => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse'
-                },
-                y: 50,
-                opacity: 0,
-                duration: 0.6,
-                delay: i * 0.2
-            });
-        });
-
-        // FAQ accordion
+        // FAQ Accordion
         document.querySelectorAll('.faq-item h3').forEach(item => {
             item.addEventListener('click', () => {
                 const parent = item.parentElement;
@@ -1061,15 +974,18 @@
             });
         });
 
-        // Parallax on scroll
-        gsap.to('.floating-element', {
-            scrollTrigger: {
-                trigger: 'body',
-                start: 'top top',
-                end: 'bottom bottom',
-                scrub: 1
-            },
-            y: -100
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
         });
     </script>
 </body>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InnerG AI Deploy — Onboarding Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #00ff88;
+            --color-secondary: #00ccff;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border: #222222;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding: 60px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--color-primary);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: var(--color-primary);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .highlight {
+            color: var(--color-primary);
+        }
+
+        .box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .box h3 {
+            color: var(--text-primary);
+            margin-top: 0;
+        }
+
+        .timeline {
+            margin: 24px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-number {
+            width: 40px;
+            height: 40px;
+            background: var(--color-primary);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .timeline-content h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .timeline-content p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            color: var(--color-primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .resources {
+            margin-top: 40px;
+        }
+
+        .resources a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .resources a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contact-item {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .contact-item strong {
+            display: block;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .logo, h2, .highlight {
+                color: #00aa55;
+                -webkit-text-fill-color: #00aa55;
+            }
+            .box, .contact-item {
+                background: #f5f5f5;
+                border-color: #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">InnerG AI Deploy</div>
+    <div class="tagline">Your AI Assistant, Deployed</div>
+    <h1 class="title">Onboarding Guide</h1>
+    <p class="subtitle">Everything you need to know before your setup session</p>
+</div>
+
+<h2>Welcome</h2>
+
+<p>You've taken the first step toward having your own <span class="highlight">24/7 AI assistant</span>. This guide will walk you through what to expect, how to prepare, and what you'll walk away with after our session.</p>
+
+<p>Your AI agent will be able to:</p>
+<ul>
+    <li>Triage your email and draft responses</li>
+    <li>Manage your calendar and schedule meetings</li>
+    <li>Send messages via Telegram, Discord, or WhatsApp</li>
+    <li>Automate repetitive tasks and workflows</li>
+    <li>Proactively remind you of important items</li>
+    <li>Connect to your tools (GitHub, Notion, and more)</li>
+</ul>
+
+<h2>What You'll Get</h2>
+
+<div class="box">
+    <h3>After Our Session, You'll Have:</h3>
+    <ul>
+        <li>A fully deployed AI agent running 24/7</li>
+        <li>Secure, hardened setup (Docker sandbox + firewall)</li>
+        <li>Email and calendar integration</li>
+        <li>Your preferred messaging channel connected</li>
+        <li>Up to 3 custom workflows configured</li>
+        <li>Documentation on how to use your agent</li>
+        <li>14 days of hands-on support (Remote) or 30 days (In-Person)</li>
+    </ul>
+</div>
+
+<h2>How to Prepare</h2>
+
+<p>To make our session as smooth as possible, please have the following ready:</p>
+
+<div class="box">
+    <h3>✓ Checklist Before Our Call</h3>
+    <ul class="checklist">
+        <li>Your calendar available (we'll connect it live)</li>
+        <li>Access to the email account you want connected</li>
+        <li>Any API keys you want integrated (optional)</li>
+        <li>A list of 3 tasks you want automated</li>
+        <li>Questions written down (we'll cover everything)</li>
+        <li>For In-Person: Your Mac or Mac Mini ready</li>
+    </ul>
+</div>
+
+<h2>What to Expect</h2>
+
+<div class="timeline">
+    <div class="timeline-item">
+        <div class="timeline-number">1</div>
+        <div class="timeline-content">
+            <h4>Kickoff Call (20-45 min)</h4>
+            <p>We discuss your goals, map your integrations, and plan your workflows. This is where we understand exactly what you need.</p>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-number">2</div>
+        <div class="timeline-content">
+            <h4>Live Setup Session (1-3 hours)</h4>
+            <p>We deploy your agent, connect your tools, configure security, and build your workflows. You'll see everything happen in real-time.</p>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-number">3</div>
+        <div class="timeline-content">
+            <h4>Go Live</h4>
+            <p>Your agent is live. You can start messaging it immediately on Telegram, Discord, or WhatsApp. It's already watching your inbox and calendar.</p>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-number">4</div>
+        <div class="timeline-content">
+            <h4>Hypercare Period</h4>
+            <p>14 days (Remote) or 30 days (In-Person) of support. We'll tune, adjust, and make sure everything runs exactly how you need it.</p>
+        </div>
+    </div>
+</div>
+
+<h2>Security & Privacy</h2>
+
+<p>Your security is non-negotiable. Here's how we protect you:</p>
+
+<ul>
+    <li><strong class="highlight">OAuth Integration:</strong> Your agent never sees raw passwords. We use OAuth to connect your accounts securely.</li>
+    <li><strong class="highlight">Docker Sandbox:</strong> Your agent runs in an isolated container, separated from your main system.</li>
+    <li><strong class="highlight">Firewall Hardening:</strong> Only necessary ports are open. Everything else is locked down.</li>
+    <li><strong class="highlight">Read-Only by Default:</strong> Your agent starts with minimal permissions. We expand access only as you build trust.</li>
+    <li><strong class="highlight">Your Data, Your Server:</strong> Everything runs on your infrastructure. We don't store your data.</li>
+</ul>
+
+<h2>Learning Resources</h2>
+
+<p>Want to learn more about what your agent can do? Check out these resources:</p>
+
+<div class="resources">
+    <ul>
+        <li><strong>OpenClaw Documentation:</strong> <a href="https://docs.openclaw.ai" target="_blank">docs.openclaw.ai</a></li>
+        <li><strong>7-Day Learning Path:</strong> <a href="https://openclaw101.dev" target="_blank">openclaw101.dev</a></li>
+        <li><strong>Skill Marketplace:</strong> <a href="https://clawhub.com" target="_blank">clawhub.com</a> (5,494+ skills available)</li>
+        <li><strong>Community:</strong> <a href="https://discord.com/invite/clawd" target="_blank">discord.com/invite/clawd</a></li>
+    </ul>
+</div>
+
+<h2>After Our Session</h2>
+
+<p>Here's what happens next:</p>
+
+<ol>
+    <li>You'll receive a summary of everything we configured</li>
+    <li>Your hypercare period begins immediately</li>
+    <li>Reach out anytime during hypercare for adjustments</li>
+    <li>After hypercare, optional managed care is available ($149/mo)</li>
+</ol>
+
+<h2>Contact & Support</h2>
+
+<div class="contact-grid">
+    <div class="contact-item">
+        <strong>Book Another Session</strong>
+        cal.com/ownyourwebsystems
+    </div>
+    <div class="contact-item">
+        <strong>Questions During Hypercare</strong>
+        Message anytime via your connected channel
+    </div>
+</div>
+
+<h2>Managed Care (Optional)</h2>
+
+<p>After your hypercare period, you can optionally subscribe to managed care for ongoing support:</p>
+
+<div class="box">
+    <h3>Managed Care — $149/month</h3>
+    <ul>
+        <li>Configuration adjustments</li>
+        <li>Diagnosis + troubleshooting</li>
+        <li>Monthly updates + security patches</li>
+        <li>Workflow tuning</li>
+    </ul>
+    <p style="margin-bottom: 0; font-size: 0.9rem;">Cancel anytime. No commitment.</p>
+</div>
+
+<h2>Frequently Asked Questions</h2>
+
+<h3>Do I need to be technical?</h3>
+<p>No. We handle everything. After setup, you just message your AI like texting an assistant.</p>
+
+<h3>What if something breaks?</h3>
+<p>During hypercare, we fix it immediately. After that, managed care covers ongoing support.</p>
+
+<h3>Can I add more workflows later?</h3>
+<p>Yes. We can build additional workflows anytime. Book a follow-up session.</p>
+
+<h3>Is my data safe?</h3>
+<p>Yes. Everything runs on your server. We use OAuth for integrations. Your data never leaves your infrastructure.</p>
+
+<h3>What channels can I use?</h3>
+<p>Telegram, Discord, WhatsApp, Signal, and more. In-Person setups also get iMessage.</p>
+
+<div class="footer">
+    <p><strong>InnerG AI Deploy</strong></p>
+    <p>Powered by OpenClaw</p>
+    <p style="margin-top: 20px; font-size: 0.85rem;">© 2026 InnerG Intel. Evolution favors action.</p>
+</div>
+
+</body>
+</html>
